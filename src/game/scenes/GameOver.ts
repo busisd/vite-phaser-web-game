@@ -1,13 +1,14 @@
+import { MyGameScene, MyGameScenes } from "../../scenes";
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 
-export class GameOver extends Scene {
+export class GameOver extends Scene implements MyGameScene {
   camera: Phaser.Cameras.Scene2D.Camera;
   background: Phaser.GameObjects.Image;
   gameOverText: Phaser.GameObjects.Text;
 
   constructor() {
-    super("GameOver");
+    super(MyGameScenes.GameOver);
   }
 
   create() {
@@ -33,6 +34,6 @@ export class GameOver extends Scene {
   }
 
   changeScene() {
-    this.scene.start("MainMenu");
+    this.scene.start(MyGameScenes.MainMenu);
   }
 }

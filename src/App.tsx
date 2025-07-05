@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { IRefPhaserGame, PhaserGame } from "./PhaserGame";
-import { MainMenu } from "./game/scenes/MainMenu";
+import { isMainMenu } from "./game/scenes/MainMenu";
+import { MyGameScenes } from "./scenes";
 
 function App() {
   // The sprite can only be moved in the MainMenu Scene
@@ -11,25 +12,26 @@ function App() {
   const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
   const changeScene = () => {
-    if (phaserRef.current) {
-      const scene = phaserRef.current.scene as MainMenu;
-
-      if (scene) {
-        scene.changeScene();
-      }
-    }
+    phaserRef.current?.scene?.changeScene();
   };
 
   const moveSprite = () => {
-    if (phaserRef.current) {
-      const scene = phaserRef.current.scene as MainMenu;
+    const scene = phaserRef.current?.scene;
 
-      if (scene && scene.scene.key === "MainMenu") {
-        // Get the update logo position
-        scene.moveLogo(({ x, y }) => {
-          setSpritePosition({ x, y });
-        });
-      }
+    if (isMainMenu(scene)) {
+      // Get the update logo position
+      scene.moveLogo(({ x, y }) => {
+        setSpritePosition({ x, y });
+      });
+    }
+  };
+
+  const addBouncingStar = () => {
+    const scene = phaserRef.current?.scene;
+
+    if (isMainMenu(scene)) {
+      // Get the update logo position
+      scene.addBouncingStar();
     }
   };
 
@@ -61,7 +63,7 @@ function App() {
 
   // Event emitted from the PhaserGame component
   const currentScene = (scene: Phaser.Scene) => {
-    setCanMoveSprite(scene.scene.key !== "MainMenu");
+    setCanMoveSprite(scene.scene.key !== MyGameScenes.MainMenu);
   };
 
   return (
@@ -89,6 +91,15 @@ function App() {
         <div>
           <button className="button" onClick={addSprite}>
             Add New Sprite
+          </button>
+        </div>
+        <div>
+          <button
+            disabled={canMoveSprite}
+            className="button"
+            onClick={addBouncingStar}
+          >
+            Add Bouncing Star
           </button>
         </div>
       </div>

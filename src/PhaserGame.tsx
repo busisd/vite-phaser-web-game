@@ -1,10 +1,11 @@
 import { RefObject, useEffect, useLayoutEffect, useRef } from "react";
 import StartGame from "./game/main";
 import { EventBus } from "./game/EventBus";
+import { MyGameScene } from "./scenes";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;
-  scene: Phaser.Scene | null;
+  scene: MyGameScene | null;
 }
 
 interface IProps {
@@ -33,14 +34,14 @@ export const PhaserGame = ({ currentActiveScene, ref }: IProps) => {
   }, [ref]);
 
   useEffect(() => {
-    EventBus.on("current-scene-ready", (scene_instance: Phaser.Scene) => {
+    EventBus.on("current-scene-ready", (sceneInstance: MyGameScene) => {
       if (currentActiveScene && typeof currentActiveScene === "function") {
-        currentActiveScene(scene_instance);
+        currentActiveScene(sceneInstance);
       }
 
       ref.current = {
         game: game.current,
-        scene: scene_instance,
+        scene: sceneInstance,
       };
     });
     return () => {

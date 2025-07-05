@@ -1,15 +1,20 @@
 import { GameObjects, Scene } from "phaser";
 
 import { EventBus } from "../EventBus";
+import { MyGameScene, MyGameScenes } from "../../scenes";
 
-export class MainMenu extends Scene {
+export const isMainMenu = (
+  scene: MyGameScene | null | undefined,
+): scene is MainMenu => scene?.scene.key === MyGameScenes.MainMenu;
+
+export class MainMenu extends Scene implements MyGameScene {
   background: GameObjects.Image;
   logo: GameObjects.Image;
   title: GameObjects.Text;
   logoTween: Phaser.Tweens.Tween | null;
 
   constructor() {
-    super("MainMenu");
+    super(MyGameScenes.MainMenu);
   }
 
   create() {
@@ -38,10 +43,10 @@ export class MainMenu extends Scene {
       this.logoTween = null;
     }
 
-    this.scene.start("Game");
+    this.scene.start(MyGameScenes.Game);
   }
 
-  moveLogo(vueCallback: ({ x, y }: { x: number; y: number }) => void) {
+  moveLogo(reactCallback: ({ x, y }: { x: number; y: number }) => void) {
     if (this.logoTween) {
       if (this.logoTween.isPlaying()) {
         this.logoTween.pause();
@@ -56,8 +61,8 @@ export class MainMenu extends Scene {
         yoyo: true,
         repeat: -1,
         onUpdate: () => {
-          if (vueCallback) {
-            vueCallback({
+          if (reactCallback) {
+            reactCallback({
               x: Math.floor(this.logo.x),
               y: Math.floor(this.logo.y),
             });
@@ -65,5 +70,17 @@ export class MainMenu extends Scene {
         },
       });
     }
+  }
+
+  addBouncingStar() {
+    const bouncingStar = this.physics.add.sprite(
+      Phaser.Math.Between(64, this.scale.width - 64),
+      Phaser.Math.Between(64, this.scale.height - 64),
+      "star",
+    );
+    bouncingStar.setGravityY(500);
+    bouncingStar.setBounce(0.85);
+    bouncingStar.setVelocityY(-200);
+    bouncingStar.setCollideWorldBounds(true);
   }
 }
