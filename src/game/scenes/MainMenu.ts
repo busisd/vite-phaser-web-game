@@ -1,10 +1,10 @@
-import { GameObjects, Scene } from "phaser";
+import { GameObjects, Input, Scene } from "phaser";
 
 import { EventBus } from "../EventBus";
 import { MyGameScene, MyGameScenes } from "../../scenes";
 
 export const isMainMenu = (
-  scene: MyGameScene | null | undefined,
+  scene: MyGameScene | null | undefined
 ): scene is MainMenu => scene?.scene.key === MyGameScenes.MainMenu;
 
 export class MainMenu extends Scene implements MyGameScene {
@@ -12,6 +12,13 @@ export class MainMenu extends Scene implements MyGameScene {
   logo: GameObjects.Image;
   title: GameObjects.Text;
   logoTween: Phaser.Tweens.Tween | null;
+
+  keyLeft?: Input.Keyboard.Key;
+  keyRight?: Input.Keyboard.Key;
+  keyUp?: Input.Keyboard.Key;
+  keyDown?: Input.Keyboard.Key;
+
+  playerStar: Phaser.GameObjects.Sprite;
 
   constructor() {
     super(MyGameScenes.MainMenu);
@@ -33,6 +40,12 @@ export class MainMenu extends Scene implements MyGameScene {
       })
       .setOrigin(0.5)
       .setDepth(100);
+
+    this.playerStar = this.physics.add.sprite(50, 50, "star");
+    this.keyLeft = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.LEFT);
+    this.keyRight = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.RIGHT);
+    this.keyUp = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.UP);
+    this.keyDown = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.DOWN);
 
     EventBus.emit("current-scene-ready", this);
   }
@@ -76,11 +89,26 @@ export class MainMenu extends Scene implements MyGameScene {
     const bouncingStar = this.physics.add.sprite(
       Phaser.Math.Between(64, this.scale.width - 64),
       Phaser.Math.Between(64, this.scale.height - 64),
-      "star",
+      "star"
     );
     bouncingStar.setGravityY(500);
     bouncingStar.setBounce(0.85);
     bouncingStar.setVelocityY(-200);
     bouncingStar.setCollideWorldBounds(true);
+  }
+
+  update(time: number, delta: number): void {
+    if (this.keyLeft?.isDown) {
+      this.playerStar.setX(this.playerStar.x - 3);
+    }
+    if (this.keyRight?.isDown) {
+      this.playerStar.setX(this.playerStar.x + 3);
+    }
+    if (this.keyUp?.isDown) {
+      this.playerStar.setY(this.playerStar.y - 3);
+    }
+    if (this.keyDown?.isDown) {
+      this.playerStar.setY(this.playerStar.y + 3);
+    }
   }
 }

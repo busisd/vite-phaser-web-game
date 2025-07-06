@@ -10,6 +10,7 @@ function App() {
   //  References to the PhaserGame component (game and scene are exposed)
   const phaserRef = useRef<IRefPhaserGame | null>(null);
   const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
+  const [cameraAngle, setCameraAngle] = useState(0);
 
   const changeScene = () => {
     phaserRef.current?.scene?.changeScene();
@@ -100,6 +101,34 @@ function App() {
             onClick={addBouncingStar}
           >
             Add Bouncing Star
+          </button>
+        </div>
+        <div>
+          <button
+            className="button"
+            onClick={() => {
+              const camera = phaserRef.current?.scene?.cameras.main;
+              if (camera) {
+                camera.setAngle(cameraAngle + 10)
+                setCameraAngle(angle => angle + 10);
+              }
+            }}
+          >
+            Rotate Camera
+          </button>
+        </div>
+        <div>
+          <button
+            className="button"
+            onClick={() => {
+              const camera = phaserRef.current?.scene?.cameras.main;
+              if (camera) {
+                camera.setScroll(camera.scrollX + 10, 0);
+                console.log(camera.worldView)
+              }
+            }}
+          >
+            Scroll Camera
           </button>
         </div>
       </div>
