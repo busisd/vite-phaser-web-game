@@ -109,8 +109,8 @@ function App() {
             onClick={() => {
               const camera = phaserRef.current?.scene?.cameras.main;
               if (camera) {
-                camera.setAngle(cameraAngle + 10)
-                setCameraAngle(angle => angle + 10);
+                camera.setAngle(cameraAngle + 10);
+                setCameraAngle((angle) => angle + 10);
               }
             }}
           >
@@ -124,7 +124,7 @@ function App() {
               const camera = phaserRef.current?.scene?.cameras.main;
               if (camera) {
                 camera.setScroll(camera.scrollX + 10, 0);
-                console.log(camera.worldView)
+                console.log(camera.worldView);
               }
             }}
           >

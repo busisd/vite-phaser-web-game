@@ -1,10 +1,10 @@
-import { GameObjects, Input, Scene } from "phaser";
+import { GameObjects, Input, Scene, Types } from "phaser";
 
 import { EventBus } from "../EventBus";
 import { MyGameScene, MyGameScenes } from "../../scenes";
 
 export const isMainMenu = (
-  scene: MyGameScene | null | undefined
+  scene: MyGameScene | null | undefined,
 ): scene is MainMenu => scene?.scene.key === MyGameScenes.MainMenu;
 
 export class MainMenu extends Scene implements MyGameScene {
@@ -18,7 +18,7 @@ export class MainMenu extends Scene implements MyGameScene {
   keyUp?: Input.Keyboard.Key;
   keyDown?: Input.Keyboard.Key;
 
-  playerStar: Phaser.GameObjects.Sprite;
+  playerStar: Types.Physics.Arcade.SpriteWithDynamicBody;
 
   constructor() {
     super(MyGameScenes.MainMenu);
@@ -47,7 +47,28 @@ export class MainMenu extends Scene implements MyGameScene {
     this.keyUp = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.UP);
     this.keyDown = this.input.keyboard?.addKey(Input.Keyboard.KeyCodes.DOWN);
 
+    this.keyLeft?.on("down", this.handleArrowKeyInputChange, this);
+    this.keyLeft?.on("up", this.handleArrowKeyInputChange, this);
+    this.keyRight?.on("down", this.handleArrowKeyInputChange, this);
+    this.keyRight?.on("up", this.handleArrowKeyInputChange, this);
+    this.keyDown?.on("down", this.handleArrowKeyInputChange, this);
+    this.keyDown?.on("up", this.handleArrowKeyInputChange, this);
+    this.keyUp?.on("down", this.handleArrowKeyInputChange, this);
+    this.keyUp?.on("up", this.handleArrowKeyInputChange, this);
+
     EventBus.emit("current-scene-ready", this);
+  }
+
+  handleArrowKeyInputChange() {
+    const xVelocitySign =
+      (this.keyLeft?.isDown ? -1 : 0) + (this.keyRight?.isDown ? 1 : 0);
+    const yVelocitySign =
+      (this.keyDown?.isDown ? 1 : 0) + (this.keyUp?.isDown ? -1 : 0);
+
+    const speed =
+      200 / (xVelocitySign !== 0 && yVelocitySign !== 0 ? Math.sqrt(2) : 1);
+    this.playerStar.setVelocityX(speed * xVelocitySign);
+    this.playerStar.setVelocityY(speed * yVelocitySign);
   }
 
   changeScene() {
@@ -89,26 +110,11 @@ export class MainMenu extends Scene implements MyGameScene {
     const bouncingStar = this.physics.add.sprite(
       Phaser.Math.Between(64, this.scale.width - 64),
       Phaser.Math.Between(64, this.scale.height - 64),
-      "star"
+      "star",
     );
     bouncingStar.setGravityY(500);
     bouncingStar.setBounce(0.85);
     bouncingStar.setVelocityY(-200);
     bouncingStar.setCollideWorldBounds(true);
-  }
-
-  update(time: number, delta: number): void {
-    if (this.keyLeft?.isDown) {
-      this.playerStar.setX(this.playerStar.x - 3);
-    }
-    if (this.keyRight?.isDown) {
-      this.playerStar.setX(this.playerStar.x + 3);
-    }
-    if (this.keyUp?.isDown) {
-      this.playerStar.setY(this.playerStar.y - 3);
-    }
-    if (this.keyDown?.isDown) {
-      this.playerStar.setY(this.playerStar.y + 3);
-    }
   }
 }
